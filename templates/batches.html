@@ -1,0 +1,38 @@
+{% extends 'index_template.html' %}
+
+{% block content %}
+
+<div class="container">
+    <hr>
+    <h2>Производственные серии антирабического иммуноглобулина</h2>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                <th class="table-element">Номер серии</th>
+                <th class="table-element">Объем серии</th>
+                <th class="table-element">Количество ампул</th>
+                <th class="table-element">Дата выпуска</th>
+                <th class="table-element">Срок годности</th>
+                <th class="table-element">Показатели качества</th>
+                <th class="table-element">Связанная документация</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for batch in batches %}
+                
+                <tr>
+                    <td class="table-element"><strong>{{ batch.title }}</strong></td>
+                    <td class="table-element"><strong>{{ batch.volume }}</strong></td>
+                    <td class="table-element"><strong>{{ batch.ampoules_quantity }}</strong></td>
+                    <td class="table-element"><strong>{{ batch.issue_date }}</strong></td>
+                    <td class="table-element"><strong>{{ batch.best_before_date }}</strong></td>
+                    <td class="table-element"><strong><a href = "{% url 'quality_protocol' title=batch.title %}"> Показатели качества серии {{ batch.title }}</strong> </a></td>
+                    <td class="table-element"><strong>{{ batch.title }}Здесь будет ссылка</strong></td>
+                 </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{% endblock %}

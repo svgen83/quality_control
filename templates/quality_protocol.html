@@ -1,0 +1,49 @@
+{% extends 'index_template.html' %}
+
+
+
+{% block content %}
+
+<a class="navbar" href="{% url 'batches'%}">К списку серий антирабического иммуноглобулина</a>
+<h2>Карточка качества серии {{batch.title}}</h2>
+
+<div class="table-responsive">
+    <table class="table">
+        <thead>
+            <tr>
+            <th class="table-element">Показатель качества</th>
+            <th class="table-element">Значение показателя</th>
+            <th class="table-element">Единица измерения</th>
+            <th class="table-element">Описание показателя</th>
+            <th class="table-element">Дата проведения контроля</th>
+            <th class="table-element">Контролер</th>
+            <th class="table-element">Референсное значение</th>
+            <th class="table-element">Референсное описание</th>
+            <th class="table-element">Описание метода</th>
+            <th class="table-element">Протокол исследования</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for protocol in protocols %}
+            
+            <tr>
+                <td class="table-element"><strong>{{ protocol.title }}</strong></td>
+                <td class="table-element"><strong>{{ protocol.value }}</strong></td>
+                <td class="table-element"><strong>{{ protocol.measure }}</strong></td>
+                <td class="table-element"><strong>{{ protocol.description }}</strong></td>
+                <td class="table-element"><strong>{{ protocol.control_date }}</strong></td>
+                <td class="table-element"><strong>{{ protocol.controler}} </strong></td>
+                <td class="table-element"><strong>{{ protocol.reference_value}}+/-{{ protocol.deviation}}</strong></td>
+                <td class="table-element"><strong>{{ protocol.reference_description}}</strong></td>
+                <td class="table-element"><strong><a href = "">{{protocol.method}}</strong> </a></td>
+                {% if protocol.media %} 
+                    <td class="table-element"><strong><a href = "{{protocol.media.url}}">Загрузить</strong> </a></td>
+                    {% else %}
+                    <td class="table-element"><strong>Файл отсутствует</strong></td>
+                {% endif %}
+             </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
