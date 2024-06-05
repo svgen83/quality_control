@@ -1,0 +1,25 @@
+{% extends 'index_template.html' %}
+
+
+
+{% block content %}
+
+<a class="navbar" href="{% url 'batches'%}">К списку серий антирабического иммуноглобулина</a>
+
+
+<div class="container">
+    <hr>
+    <h2>{{title}}</h2>
+    <h2>Описание метода</h2>
+<p>
+  {{description}} <br>
+
+  <h2>Метод встречается в следующей документации</h2>
+  {% for doc in docs_serialized %}
+  {{ doc.title }} <br>
+  {% endfor %}
+
+  
+</p>
+</div>
+{% endblock %}

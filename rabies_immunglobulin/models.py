@@ -102,13 +102,24 @@ class StandartSample(models.Model):
         return self.title
 
 
-class SpecificationStandart(models.Model):  
+class SpecificationStandart(models.Model):
+    MEASURE_CHOICE = (
+        ('No measure', 'Нет размерности'),
+        ('UI', 'Международные единицы'),
+        ('percents', '%'),
+        ('OI', 'Единица оптической плотности'),
+        ('temperature', 'градус Цельсия'))
+    
     title = models.CharField(
         max_length=200,
         verbose_name='название спецификационной характеристики')
     measure = models.CharField(
-        max_length=5,
-        verbose_name='единица измерения')
+        max_length=50,
+        verbose_name='единица измерения',
+        choices=MEASURE_CHOICE,
+        default='No measure',
+        db_index=True,
+        blank=True)
     reference_description = models.CharField(
         max_length=200,
         verbose_name='Описание характеристики',
@@ -200,7 +211,7 @@ class SpecificationParameter(models.Model):
         ('UI', 'Международные единицы'),
         ('percents', '%'),
         ('OI', 'Единица оптической плотности'),
-        ('temperature', 'градус Цельсия'))
+        ('temperature', 'градус Цельсия'))# дублируется
         
     title = models.ForeignKey(
         SpecificationStandart, on_delete=models.DO_NOTHING,
@@ -212,12 +223,12 @@ class SpecificationParameter(models.Model):
         blank=True,
         verbose_name='Количественное значение')
     measure = models.CharField(
-        max_length=200,
+        max_length=50,
         verbose_name='Единица измерения',
         choices=MEASURE_CHOICE,
         default='No measure',
         db_index=True,
-        blank = True)
+        blank=True)
     description = models.TextField(
         verbose_name='Описание значения',
         blank = 'True')
@@ -231,7 +242,7 @@ class SpecificationParameter(models.Model):
     method_doc = models.CharField(
         max_length=200,
         verbose_name='Документация с описанием метода контроля',
-        blank=True, null=True) 
+        blank=True, null=True) # дублируется
     butch_series = models.ForeignKey(
         Batch, on_delete=models.DO_NOTHING,
         related_name='batch_parameters',

@@ -19,6 +19,7 @@
             <th class="table-element">Контролер</th>
             <th class="table-element">Референсное значение</th>
             <th class="table-element">Референсное описание</th>
+            <th class="table-element">Стандартный образец</th>
             <th class="table-element">Описание метода</th>
             <th class="table-element">Протокол исследования</th>
             </tr>
@@ -35,7 +36,8 @@
                 <td class="table-element"><strong>{{ protocol.controler}} </strong></td>
                 <td class="table-element"><strong>{{ protocol.reference_value}}+/-{{ protocol.deviation}}</strong></td>
                 <td class="table-element"><strong>{{ protocol.reference_description}}</strong></td>
-                <td class="table-element"><strong><a href = "">{{protocol.method}}</strong> </a></td>
+                <td class="table-element"><strong><a href = ""> {{protocol.standart_samples}}</strong></td>
+                <td class="table-element"><strong><a href = "{% url 'method' pk=protocol.pk %}"> {{protocol.method}}</strong></a>  </td>
                 {% if protocol.media %} 
                     <td class="table-element"><strong><a href = "{{protocol.media.url}}">Загрузить</strong> </a></td>
                     {% else %}

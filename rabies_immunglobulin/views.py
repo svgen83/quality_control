@@ -44,7 +44,9 @@ def get_batch_protocol(request, title):
             'deviation': reference.deviation,
             'reference_description': reference.reference_description,
             'method': reference.methods.title,
-            'media': protocol.media
+            'media': protocol.media,
+            'standart_samples': protocol.standart_samples,
+            'pk': reference.methods.pk
                                }
         serialized_protocols.append(serialized_protocol)
     
@@ -58,18 +60,16 @@ def get_batch_protocol(request, title):
 
 
 
+def get_method(request, pk):
+    method = Method.objects.get(pk=pk)
+    docs = Document.objects.filter(methods=method)
+    docs_serialized = [doc.title for doc in docs]
+    print(docs_serialized)
 
-
-##def get_batch_protocol(request, title):
-##    batch = Batch.objects.get(title=title)
-##    protocols = [i for i  in batch.batch_parameters.order_by('title')]
-##
-##    
-##    print(protocols[0].title.upper_limit)
-##    
-##    return render(
-##        request,
-##        "quality_protocol.html",
-##        context={'protocols': protocols,
-##                 }
-##        )
+    return render(
+        request,
+        "method.html",
+        context={'title': method.title,
+                 'description': method.description,
+                 'docs_serialized': docs_serialized}
+        )

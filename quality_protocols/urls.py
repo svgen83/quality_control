@@ -26,6 +26,8 @@ urlpatterns = [
 ##    re_path(r'^horse/(?P<id>\d+)/$', views.horse, name='horse')
     re_path(r'^quality_protocol/(?P<title>\w+)/$',
             views.get_batch_protocol, name='quality_protocol'),
+    re_path(r'^method/(?P<pk>\d+)/$',
+            views.get_method, name='method'),
     path('admin/', admin.site.urls),
 ##    path('chaining/', include('smart_selects.urls')),
     path('', views.index, name='index'),
