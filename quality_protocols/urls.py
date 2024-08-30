@@ -28,9 +28,21 @@ urlpatterns = [
             views.get_batch_protocol, name='quality_protocol'),
     re_path(r'^method/(?P<pk>\d+)/$',
             views.get_method, name='method'),
+    re_path(r'^batch_docs/(?P<title>\w+)/$',
+            views.get_batch_docs,
+            name='batch_docs'),
+    re_path(r'^standart_sample/(?P<title>\D+)/$',
+            views.get_standart_sample,
+            name='standart_sample'),
+
     path('admin/', admin.site.urls),
 ##    path('chaining/', include('smart_selects.urls')),
     path('', views.index, name='index'),
     path('batches', views.get_batches, name='batches'),
+    path('graphs/', views.get_graphs, name='graphs'),
+##    path('standart_sample/',
+##            views.get_standart_sample,
+##            name='standart_sample'),
+    
     path('accounts/', include('django.contrib.auth.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

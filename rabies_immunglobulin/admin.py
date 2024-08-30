@@ -24,7 +24,7 @@ class StandartSampleAdmin(admin.ModelAdmin):
 
 @admin.register(SpecificationStandart)
 class SpecificationStandartAdmin(admin.ModelAdmin):
-    list_display = ['title']
+    list_display = [ 'title']
 
 
 @admin.register(Document)
@@ -34,7 +34,12 @@ class DocumentAdmin(admin.ModelAdmin):
 
 @admin.register(SpecificationParameter)
 class SpecificationParameterAdmin(admin.ModelAdmin):
-    list_display = ['title']
+    list_display = ['title', 'butch_series']
+    
+    def butch_series(self, obj):
+        return obj.butch_series.title
+    butch_series.short_description = 'Номер серии'
+    butch_series.admin_order_field = 'butch_series__title'
 
 
 @admin.register(Employee)

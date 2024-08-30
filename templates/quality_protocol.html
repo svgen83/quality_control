@@ -36,7 +36,11 @@
                 <td class="table-element"><strong>{{ protocol.controler}} </strong></td>
                 <td class="table-element"><strong>{{ protocol.reference_value}}+/-{{ protocol.deviation}}</strong></td>
                 <td class="table-element"><strong>{{ protocol.reference_description}}</strong></td>
-                <td class="table-element"><strong><a href = ""> {{protocol.standart_samples}}</strong></td>
+								{% if protocol.standart_sample %}
+                  <td class="table-element"><strong><a href = "{% url 'standart_sample' title=protocol.standart_sample %}"> {{protocol.standart_sample}}</strong></td>
+								{% else %}
+                  <td class="table-element"><strong>Стандартный образец отсутствует</strong></td>
+								 {% endif %}
                 <td class="table-element"><strong><a href = "{% url 'method' pk=protocol.pk %}"> {{protocol.method}}</strong></a>  </td>
                 {% if protocol.media %} 
                     <td class="table-element"><strong><a href = "{{protocol.media.url}}">Загрузить</strong> </a></td>

@@ -1,0 +1,25 @@
+{% extends 'index_template.html' %}
+
+
+
+{% block content %}
+
+<a class="navbar" href="{% url 'batches'%}">К списку серий антирабического иммуноглобулина</a>
+<h2>Документация на серию {{docs}}</h2>
+
+<div class="table-responsive">
+    <table class="table">
+        <thead>
+            <tr>
+            <th class="table-element">Название документа</th>
+            </tr>
+        </thead>
+        <tbody>
+                        
+            <tr>
+                <td class="table-element"><strong>{{docs}}</strong></td>
+             </tr>
+        </tbody>
+    </table>
+</div>
+{% endblock %}

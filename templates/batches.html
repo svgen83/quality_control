@@ -28,7 +28,7 @@
                     <td class="table-element"><strong>{{ batch.issue_date }}</strong></td>
                     <td class="table-element"><strong>{{ batch.best_before_date }}</strong></td>
                     <td class="table-element"><strong><a href = "{% url 'quality_protocol' title=batch.title %}"> Показатели качества серии {{ batch.title }}</strong> </a></td>
-                    <td class="table-element"><strong>{{ batch.title }}Здесь будет ссылка</strong></td>
+                    <td class="table-element"><strong><a href = "{% url 'batch_docs' title=batch.title %}"> Документация на серию {{ batch.title }}</strong> </a></td>
                  </tr>
                 {% endfor %}
             </tbody>

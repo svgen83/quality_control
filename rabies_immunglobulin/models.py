@@ -90,7 +90,7 @@ class StandartSample(models.Model):
         verbose_name='срок годности')
     documents = models.ForeignKey(Document,
         verbose_name='документация', blank =True,
-        on_delete=models.DO_NOTHING,null = True,
+        on_delete=models.DO_NOTHING, null = True,
         related_name='sample')
 
     class Meta:

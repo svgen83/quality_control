@@ -1,0 +1,26 @@
+{% extends 'index_template.html' %}
+
+
+
+{% block content %}
+
+<a class="navbar" href="{% url 'batches'%}">К списку серий антирабического иммуноглобулина</a>
+
+ <form method='post' action="">
+    {% csrf_token %}
+    <select name ='specification_obj'>
+      {% for specification_obj in specifications %}
+         <option value="{{specification_obj}}">{{specification_obj}}</option>     
+      {% endfor %}
+    </select>
+    <input type="submit" value="Выбрать показатель качества"/>
+  </form>
+	
+{% if specification_title %}
+ 
+ {% autoescape off %}
+  {{plot}}
+ {% endautoescape %}
+{% endif %}
+
+{% endblock %}
