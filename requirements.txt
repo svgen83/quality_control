@@ -1,0 +1,7 @@
+Django==4.2.13
+django-smart-selects==1.6.0
+numpy==2.0.2
+pandas==2.2.2
+pillow==10.3.0
+plotly==5.23.0
+

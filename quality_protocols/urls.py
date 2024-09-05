@@ -21,6 +21,21 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as authViews
 from rabies_immunglobulin import views
+##from django.urls import path, register_converter
+##from datetime import datetime
+
+
+##class DateConverter:
+##    regex = '\d{4}-\d{2}-\d{2}'
+##
+##    def to_python(self, value):
+##        return datetime.strptime(value, '%Y-%m-%d')
+##
+##    def to_url(self, value):
+##        return value
+##
+##
+##register_converter(DateConverter, 'yyyy')
 
 urlpatterns = [
 ##    re_path(r'^horse/(?P<id>\d+)/$', views.horse, name='horse')
@@ -31,9 +46,10 @@ urlpatterns = [
     re_path(r'^batch_docs/(?P<title>\w+)/$',
             views.get_batch_docs,
             name='batch_docs'),
-    re_path(r'^standart_sample/(?P<title>\D+)/$',
+    re_path(r'^standart_sample/(?P<title>\D+)/(?P<date>\d{4}-\d{2}-\d{2})/$',
             views.get_standart_sample,
             name='standart_sample'),
+
 
     path('admin/', admin.site.urls),
 ##    path('chaining/', include('smart_selects.urls')),

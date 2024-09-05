@@ -26,6 +26,7 @@ class Document(models.Model):
         default='Primary',
         db_index=True,
         blank=True)
+    doc_media = models.FileField(upload_to='media', null=True, blank=True)
     
     class Meta:
         verbose_name = 'Документация'
@@ -51,51 +52,6 @@ class Method(models.Model):
     class Meta:
         verbose_name = 'Метод контроля'
         verbose_name_plural = 'Методы контроля'
-        ordering = ['title']
-
-    def __str__(self):
-        return self.title
-
-
-class StandartSample(models.Model):
-    TYPE_CHOICE = (
-        ('PH', 'Фармакопейный'),
-        ('RF', 'Государственный'),
-        ('OSO', 'Отраслевой'),
-        ('WHO', 'Стандарт ВОЗ'),
-        ('IN_HOUSE', 'Стандарт предприятия')
-    )
-    title = models.CharField(max_length=200,
-                             verbose_name='название стандартного образца')
-    reg_number = models.PositiveIntegerField(
-        verbose_name='Регистрационный номер')
-    value = models.DecimalField(
-        decimal_places=3,
-        max_digits=10,
-        verbose_name='Значение определяемой характеристики',
-        blank=True)
-    indicator = models.CharField(
-        max_length=200,
-        verbose_name='Определяемая характеристика')
-    sample_type = models.CharField(
-        max_length=200,
-        verbose_name='Вид стандартного образца',
-        choices=TYPE_CHOICE,
-        default='IN_HOUSE',
-        db_index=True,
-        blank=True)
-    issue_date = models.DateField(
-        verbose_name='дата выпуска')
-    best_before_date = models.DateField(
-        verbose_name='срок годности')
-    documents = models.ForeignKey(Document,
-        verbose_name='документация', blank =True,
-        on_delete=models.DO_NOTHING, null = True,
-        related_name='sample')
-
-    class Meta:
-        verbose_name = 'Стандартный образец'
-        verbose_name_plural = 'Стандартные образцы'
         ordering = ['title']
 
     def __str__(self):
@@ -155,6 +111,57 @@ class SpecificationStandart(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class StandartSample(models.Model):
+    TYPE_CHOICE = (
+        ('PH', 'Фармакопейный'),
+        ('RF', 'Государственный'),
+        ('OSO', 'Отраслевой'),
+        ('WHO', 'Стандарт ВОЗ'),
+        ('IN_HOUSE', 'Стандарт предприятия')
+    )
+    title = models.CharField(max_length=200,
+                             verbose_name='название стандартного образца')
+    reg_number = models.PositiveIntegerField(
+        verbose_name='Регистрационный номер')
+    value = models.DecimalField(
+        decimal_places=3,
+        max_digits=10,
+        verbose_name='Значение определяемой характеристики',
+        blank=True)
+    sample_type = models.CharField(
+        max_length=200,
+        verbose_name='Вид стандартного образца',
+        choices=TYPE_CHOICE,
+        default='IN_HOUSE',
+        db_index=True,
+        blank=True)
+    issue_date = models.DateField(
+        verbose_name='дата выпуска')
+    best_before_date = models.DateField(
+        verbose_name='срок годности')
+    documents = models.ForeignKey(Document,
+        verbose_name='документация', blank =True,
+        on_delete=models.DO_NOTHING, null = True,
+        related_name='sample')
+    indicator = models.ForeignKey(
+        SpecificationStandart,
+        blank =True,
+        on_delete=models.DO_NOTHING, null = True,
+        verbose_name='Определяемая характеристика',
+        related_name = 'reference_sample')
+
+    class Meta:
+        verbose_name = 'Стандартный образец'
+        verbose_name_plural = 'Стандартные образцы'
+        ordering = ['title']
+
+    def __str__(self):
+        return self.title
+
+
+
 
 
 class Employee(models.Model):
@@ -239,10 +246,6 @@ class SpecificationParameter(models.Model):
         verbose_name='Контролер')
     control_date = models.DateField(
         verbose_name='дата проведения контроля')
-    method_doc = models.CharField(
-        max_length=200,
-        verbose_name='Документация с описанием метода контроля',
-        blank=True, null=True) # дублируется
     butch_series = models.ForeignKey(
         Batch, on_delete=models.DO_NOTHING,
         related_name='batch_parameters',
