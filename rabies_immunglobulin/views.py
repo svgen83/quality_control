@@ -2,9 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponseNotFound
 from django.contrib.auth.decorators import login_required
 
-import pandas as pd
 import numpy as np
-import plotly
 
 from plotly.offline import plot
 import plotly.graph_objs as go
