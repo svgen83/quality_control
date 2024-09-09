@@ -110,7 +110,6 @@ def get_method(request, pk):
     method = Method.objects.get(pk=pk)
     docs = Document.objects.filter(methods=method)
     docs_serialized = [doc.title for doc in docs]
-    print(docs_serialized)
 
     return render(
         request,
@@ -122,8 +121,9 @@ def get_method(request, pk):
 
 
 def f(x_data, b):
-    x = np.arange(x_data[0], (x_data[-1] + 1))
+    x = np.array(x_data)
     y = 0*x + b
+    print(y)
     return y
 
 
@@ -133,18 +133,19 @@ def get_shuechart_data(specification_title):
     sp_standart = SpecificationStandart.objects.get(title=specification_title)
     y_data = []
     x_data = []
+
     parameters = [batch.batch_parameters.filter(
-            title__title__contains=specification_title).values() for batch in batches]
-    print(parameters)
+            title__title__contains=specification_title) for batch in batches]
+    
     for parameter in parameters:
         if parameter:
-            y_data.append(parameter[0]['value'])
-            x_data.append(parameter[0]['butch_series_id'])
+            y_data.append(float(parameter[0].value))
+            x_data.append(parameter[0].butch_series.title)
 
     r_list = [np.abs(y_data[index] - y_data[index+1]) for index,_ in enumerate(y_data[:-1])]
     x_r = x_data[1:]
-    mean_y = float(np.mean(y_data))
-    mean_r = float(np.mean(r_list))
+    mean_y = np.mean(y_data)
+    mean_r = np.mean(r_list)
     ucl = mean_y + 2.66*mean_r
     lcl = mean_y - 2.66*mean_r
     reference_value = sp_standart.reference_value
@@ -177,7 +178,8 @@ def get_shuechart_data(specification_title):
     
 
 def plot_x_shuechart(shuechart_data, specification_title):
-           
+    ticks_x_list = list(map(str, shuechart_data['x_data']))
+
     fig = go.Figure()
     fig.add_trace(go.Scatter(
         x=shuechart_data['x_data'],
@@ -240,12 +242,16 @@ def plot_x_shuechart(shuechart_data, specification_title):
                   title=f"Карта Шухарта X {specification_title}",
                   xaxis_title="Производственные серии",
                   yaxis_title="Значения показателя",
-                  xaxis = dict(tickmode = 'linear', dtick = 1),
+                  xaxis = dict(
+                      type='category',
+                      tickvals = ticks_x_list),
                   margin=dict(l=0, r=0, t=30, b=0))
 
     return plot(fig, output_type='div')
 
 def plot_r_shuechart(shuechart_data, specification_title):
+    ticks_x_list = list(map(str, shuechart_data['x_data']))
+
     fig = go.Figure()
 
     fig.add_trace(go.Scatter(
@@ -269,7 +275,9 @@ def plot_r_shuechart(shuechart_data, specification_title):
                   title=f"Карта Шухарта Rm {specification_title}",
                   xaxis_title="Производственные серии",
                   yaxis_title="Значения размаха",
-                  xaxis = dict(tickmode = 'linear', dtick = 1),
+                  xaxis = dict(
+                      type='category',
+                      tickvals = ticks_x_list),
                   margin=dict(l=0, r=0, t=30, b=0))
 
     return plot(fig, output_type='div')
@@ -283,10 +291,8 @@ def get_graphs(request):
     for i in specifications:
         specification_titles.append(i.title)
     specification_title = request.POST.get('specification_obj')
-    print(specification_title)
     if specification_title:
         shuechart_data = get_shuechart_data(specification_title)
-        print(shuechart_data)
         plot_x = plot_x_shuechart(shuechart_data, specification_title)
         plot_r = plot_r_shuechart(shuechart_data, specification_title)
         context = {
