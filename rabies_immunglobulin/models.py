@@ -186,7 +186,7 @@ class Employee(models.Model):
 
 class Batch(models.Model):
     title = models.PositiveSmallIntegerField(
-        verbose_name='Номер серии')
+        verbose_name='Номер серии', unique=True)
     volume = models.DecimalField(
         decimal_places=3,
         max_digits=10,
@@ -262,6 +262,7 @@ class SpecificationParameter(models.Model):
         verbose_name = 'Значение показателя качества'
         verbose_name_plural = 'Значения показателей качества'
         ordering = ['title']
+        unique_together = ('title', 'butch_series')
 
     def __str__(self):
         return str(self.title)
