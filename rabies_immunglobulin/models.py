@@ -1,4 +1,5 @@
 from django.db import models
+from datetime import date
 ##from smart_selects.db_fields import ChainedForeignKey,GroupedForeignKey
 # Create your models here.
 
@@ -61,7 +62,7 @@ class Method(models.Model):
 class SpecificationStandart(models.Model):
     MEASURE_CHOICE = (
         ('No measure', 'Нет размерности'),
-        ('UI', 'Международные единицы'),
+        ('UI', 'Международные единицы в мл'),
         ('percents', '%'),
         ('OI', 'Единица оптической плотности'),
         ('temperature', 'градус Цельсия'))
@@ -77,36 +78,27 @@ class SpecificationStandart(models.Model):
         db_index=True,
         blank=True)
     reference_description = models.CharField(
-        max_length=200,
+        max_length=1000,
         verbose_name='Описание характеристики',
         blank = True, null = True)
     upper_limit = models.DecimalField(
         max_digits = 10,
-        decimal_places = 2,
+        decimal_places = 3,
         verbose_name='Максимальное значение',
         blank=True, null = True)
     lower_limit = models.DecimalField(
         max_digits = 10,
-        decimal_places = 2,
+        decimal_places = 3,
         verbose_name='Минимальное значение',
         blank=True, null=True)
-    reference_value = models.DecimalField(
-        max_digits = 10,
-        decimal_places = 2,
-        blank = True, null = True)
-    deviation = models.DecimalField(
-        max_digits = 10,
-        decimal_places = 2,
-        verbose_name='Допустимое отклонение от референс-значения',
-        blank = True, null = True)
     methods = models.ForeignKey(Method,
         verbose_name='Метод определения', blank=True,
         on_delete=models.DO_NOTHING,
         related_name='reference_value')
 
     class Meta:
-        verbose_name = 'Референсное значение показателя качества'
-        verbose_name_plural = 'Референсные значения показателей качества'
+        verbose_name = 'Нормативное значение показателя качества'
+        verbose_name_plural = 'Нормативные значения показателей качества'
         ordering = ['title']
 
     def __str__(self):
@@ -161,9 +153,6 @@ class StandartSample(models.Model):
         return self.title
 
 
-
-
-
 class Employee(models.Model):
     title = models.CharField(max_length=200,
                              verbose_name='Фамилия, имя, отчество')
@@ -192,8 +181,10 @@ class Batch(models.Model):
         max_digits=10,
         verbose_name='Объем серии',
         blank=True)
+    packs_quantity = models.PositiveSmallIntegerField(
+        verbose_name='Количество упаковок', blank=True)
     ampoules_quantity = models.PositiveSmallIntegerField(
-        verbose_name='Количество ампул')
+        verbose_name='Количество ампул', blank=True)
     issue_date = models.DateField(
         verbose_name='дата выпуска')
     best_before_date = models.DateField(
@@ -215,7 +206,7 @@ class Batch(models.Model):
 class SpecificationParameter(models.Model):
     MEASURE_CHOICE = (
         ('No measure', 'Нет размерности'),
-        ('UI', 'Международные единицы'),
+        ('UI', 'Международные единицы в мл'),
         ('percents', '%'),
         ('OI', 'Единица оптической плотности'),
         ('temperature', 'градус Цельсия'))# дублируется
@@ -244,8 +235,11 @@ class SpecificationParameter(models.Model):
         related_name='control_carry',
         blank=True,
         verbose_name='Контролер')
-    control_date = models.DateField(
-        verbose_name='дата проведения контроля')
+    begin_control_date = models.DateField(
+        verbose_name='дата начала контроля', default=date.today)
+    end_control_date = models.DateField(
+        verbose_name='дата завершения контроля', blank = True,
+        default=date.today)
     butch_series = models.ForeignKey(
         Batch, on_delete=models.DO_NOTHING,
         related_name='batch_parameters',
@@ -259,8 +253,8 @@ class SpecificationParameter(models.Model):
     media = models.FileField(upload_to='media', null=True, blank=True)
 
     class Meta:
-        verbose_name = 'Значение показателя качества'
-        verbose_name_plural = 'Значения показателей качества'
+        verbose_name = 'Значение показателя качества производственной серии'
+        verbose_name_plural = 'Значения показателей качества производственных серий'
         ordering = ['title']
         unique_together = ('title', 'butch_series')
 
