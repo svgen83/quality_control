@@ -47,7 +47,7 @@ def get_batch_protocol(request, title):
             'measure': protocol.get_measure_display(),
             'description': protocol.description,
             'controler': protocol.controler,
-            'control_date': protocol.control_date,
+            'control_date': protocol.end_control_date,
             'up_value': reference.upper_limit,
             'low_value': reference.lower_limit,
             'reference_description': reference.reference_description,
@@ -123,7 +123,6 @@ def get_method(request, pk):
 def f(x_data, b):
     x = np.array(x_data)
     y = 0*x + b
-    print(y)
     return y
 
 
@@ -148,7 +147,8 @@ def get_shuechart_data(specification_title):
     mean_r = np.mean(r_list)
     ucl = mean_y + 2.66*mean_r
     lcl = mean_y - 2.66*mean_r
-    reference_value = sp_standart.reference_value
+    up_value = sp_standart.upper_limit
+    low_value = sp_standart.lower_limit
     sigma = mean_r/1.128
     c_up = mean_y + sigma
     c_l = mean_y - sigma
@@ -157,7 +157,7 @@ def get_shuechart_data(specification_title):
     a_up = mean_y + 3*sigma
     a_l = mean_y - 3*sigma
     r_up = 3.267*mean_r
-
+    
     return {'y_data': y_data,
             'x_data': x_data,
             'x_data_r': x_r,
@@ -173,13 +173,22 @@ def get_shuechart_data(specification_title):
             'b_l': b_l,
             'a_l': a_l,
             'r_up': r_up,
-            'reference_value': reference_value,
+            'up_value': up_value,
+            'low_value': low_value,
             }
     
-
+def trend_data(x,y):
+    trend = np.polyfit(x, y, 1)
+    equation = np.poly1d(trend)
+    return equation(x)
+    
 def plot_x_shuechart(shuechart_data, specification_title):
     ticks_x_list = list(map(str, shuechart_data['x_data']))
-
+    trend = np.polyfit(shuechart_data['x_data'],
+        shuechart_data['y_data'], 1)
+    p = np.poly1d(trend)
+    print(p)
+   
     fig = go.Figure()
     fig.add_trace(go.Scatter(
         x=shuechart_data['x_data'],
@@ -187,55 +196,70 @@ def plot_x_shuechart(shuechart_data, specification_title):
         mode='lines+markers', name='Динамика',
         opacity=0.8, marker_color='green',))
 
+    fig.add_trace(go.Scatter(x=shuechart_data['x_data'],
+        y=trend_data(shuechart_data['x_data'],shuechart_data['y_data']),
+        opacity=1, name='Линия тренда', marker_color='black'))
+
     fig.add_trace(go.Scatter(
         x=shuechart_data['x_data'],
         y=f(shuechart_data['x_data'], shuechart_data['mean_y']),
-        name='Среднее значение'))
+        name='Среднее значение', marker_color='orange'))
 
     fig.add_trace(go.Scatter(
         x=shuechart_data['x_data'],
         y=f(shuechart_data['x_data'], shuechart_data['ucl']),
-        name='Верхняя граница'))
+        name='Верхняя граница',
+        marker_color='red'))
 
     fig.add_trace(go.Scatter(
         x=shuechart_data['x_data'],
         y=f(shuechart_data['x_data'], shuechart_data['lcl']),
-        name='Нижняя граница'))
+        name='Нижняя граница',
+        marker_color='red'))
 
-    fig.add_trace(go.Scatter(
-        x=shuechart_data['x_data'],
-        y=f(shuechart_data['x_data'], shuechart_data['reference_value']),
-        name='Среднее нормативное значение'))
+    if shuechart_data['up_value']:
+        fig.add_trace(go.Scatter(
+            x=shuechart_data['x_data'],
+            y=f(shuechart_data['x_data'], shuechart_data['up_value']),
+            name='Максимальное нормативное значение',
+            marker_color='blue'))
+    
+    if shuechart_data['low_value']:
+        fig.add_trace(go.Scatter(
+            x=shuechart_data['x_data'],
+            y=f(shuechart_data['x_data'], shuechart_data['low_value']),
+            name='Минимальное нормативное значение',
+            marker_color='blue'))
 
     fig.add_trace(go.Scatter(
         x=shuechart_data['x_data'],
         y=f(shuechart_data['x_data'], shuechart_data['c_up']),
-        name='c_up'))
+        name='c_up', opacity=0.2, marker_color='grey'))
 
     fig.add_trace(go.Scatter(
         x=shuechart_data['x_data'],
         y=f(shuechart_data['x_data'], shuechart_data['c_l']),
-        name='c_l'))
+        name='c_l', opacity=0.2, marker_color='grey'))
 
     fig.add_trace(go.Scatter(
         x=shuechart_data['x_data'],
         y=f(shuechart_data['x_data'], shuechart_data['b_up']),
-        name='b_up'))
+        name='b_up', opacity=0.2, marker_color='grey'))
 
     fig.add_trace(go.Scatter(
         x=shuechart_data['x_data'],
         y=f(shuechart_data['x_data'], shuechart_data['b_l']),
-        name='b_l'))
+        name='b_l', opacity=0.2, marker_color='grey'))
 
     fig.add_trace(go.Scatter(
         x=shuechart_data['x_data'],
         y=f(shuechart_data['x_data'], shuechart_data['a_up']),
-        name='a_up'))
+        name='a_up', opacity=0.2, marker_color='grey'))
 
     fig.add_trace(go.Scatter(
         x=shuechart_data['x_data'],
         y=f(shuechart_data['x_data'], shuechart_data['a_l']),
-        name='a_l'))
+        name='a_l', opacity=0.2, marker_color='grey'))
 
     fig.update_layout(legend_orientation="h",
                   legend=dict(x=.5, xanchor="center"),
@@ -269,6 +293,10 @@ def plot_r_shuechart(shuechart_data, specification_title):
         x=shuechart_data['x_data_r'],
         y=f(shuechart_data['x_data_r'], shuechart_data['r_up']),
         name='Верхняя контрольная граница размаха'))
+    
+    fig.add_trace(go.Scatter(x=shuechart_data['x_data_r'],
+        y=trend_data(shuechart_data['x_data_r'],shuechart_data['r_list']),
+        opacity=1, name='Линия тренда', marker_color='black'))
 
     fig.update_layout(legend_orientation="h",
                   legend=dict(x=.5, xanchor="center"),
@@ -289,7 +317,8 @@ def get_graphs(request):
     specifications = SpecificationStandart.objects.all()
     specification_titles = []
     for i in specifications:
-        specification_titles.append(i.title)
+        if i.upper_limit or i.lower_limit:
+            specification_titles.append(i.title)
     specification_title = request.POST.get('specification_obj')
     if specification_title:
         shuechart_data = get_shuechart_data(specification_title)
