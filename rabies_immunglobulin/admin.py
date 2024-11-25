@@ -6,8 +6,8 @@ from django.forms import CheckboxSelectMultiple
 from .models import (Batch, StandartSample,
                      SpecificationStandart,Document,
                      SpecificationParameter, Employee,
-                     Method,                     
-                     ) 
+                     Method,
+                     )
 
 # Register your models here.
 @admin.register(Batch)
@@ -19,7 +19,7 @@ class BatchAdmin(admin.ModelAdmin):
 
 @admin.register(StandartSample)
 class StandartSampleAdmin(admin.ModelAdmin):
-    list_display = ['title']
+    list_display = ['title', 'reg_number']
 
 
 @admin.register(SpecificationStandart)
@@ -35,7 +35,7 @@ class DocumentAdmin(admin.ModelAdmin):
 @admin.register(SpecificationParameter)
 class SpecificationParameterAdmin(admin.ModelAdmin):
     list_display = ['title', 'butch_series']
-    
+
     def butch_series(self, obj):
         return obj.butch_series.title
     butch_series.short_description = 'Номер серии'

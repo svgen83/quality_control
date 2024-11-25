@@ -5,48 +5,57 @@
 {% block content %}
 
 <a class="navbar" href="{% url 'batches'%}">К списку серий антирабического иммуноглобулина</a>
-<h2>Карточка качества серии {{batch.title}}</h2>
-
+<h2>Паспортные данные серии {{batch.title}}</h2>
 <div class="table-responsive">
     <table class="table">
         <thead>
             <tr>
-            <th class="table-element">Показатель качества</th>
-            <th class="table-element">Значение показателя</th>
-            <th class="table-element">Единица измерения</th>
-            <th class="table-element">Описание показателя</th>
+            <th class="table-element">Показатель качества, единица измерения</th>
+            <th class="table-element">Нормативное значение</th>
+            <th class="table-element">Описание в соответствии с НД/ФСП показателя</th>
             <th class="table-element">Дата проведения контроля</th>
-            <th class="table-element">Контролер</th>
-            <th class="table-element">Референсное значение</th>
-            <th class="table-element">Референсное описание</th>
+            <th class="table-element">Значение показателя</th>
+            <th class="table-element">Описание показателя</th>
             <th class="table-element">Стандартный образец</th>
             <th class="table-element">Описание метода</th>
-            <th class="table-element">Протокол исследования</th>
             </tr>
         </thead>
         <tbody>
             {% for protocol in protocols %}
-            
+
             <tr>
-                <td class="table-element"><strong>{{ protocol.title }}</strong></td>
-                <td class="table-element"><strong>{{ protocol.value }}</strong></td>
-                <td class="table-element"><strong>{{ protocol.measure }}</strong></td>
+                <td class="table-element"><strong>{{ protocol.title }}, {{ protocol.measure }}</strong></td>
+                				{% if protocol.low_value and protocol.up_value %}
+                    <td class="table-element"><strong>от {{ protocol.low_value}} до {{ protocol.up_value }}</strong></td>
+								{% elif protocol.low_value and not protocol.up_value %}
+                	<td class="table-element"><strong>от {{ protocol.low_value}}</strong></td>
+								{% elif protocol.up_value and not protocol.low_value %}
+                	<td class="table-element"><strong>До {{ protocol.up_value}}</strong></td>
+								{%elif not protocol.low_value and not protocol.up_value%}
+									<td class="table-element"><strong>Количественные значения не заданы</strong></td>
+								{% endif %}
+                			{% if protocol.reference_description %}
+                	<td class="table-element"><strong>{{ protocol.reference_description}}</strong></td>
+								{% else %}
+									<td class="table-element"><strong>описания не найдено</strong></td>
+								{% endif %}
+				<td class="table-element"><strong>{{ protocol.control_date|date:"d.m.Y" }}</strong></td>
+                {%if protocol.value %}
+                    <td class="table-element"><strong>{{ protocol.value }}</strong></td>
+                {%else%}
+                    <td class="table-element"><strong> </strong></td>
+                {%endif%}
+
                 <td class="table-element"><strong>{{ protocol.description }}</strong></td>
-                <td class="table-element"><strong>{{ protocol.control_date }}</strong></td>
-                <td class="table-element"><strong>{{ protocol.controler}} </strong></td>
-                <td class="table-element"><strong>{{ protocol.reference_value}}+/-{{ protocol.deviation}}</strong></td>
-                <td class="table-element"><strong>{{ protocol.reference_description}}</strong></td>
-				{% if protocol.standart_sample %}
-                  <td class="table-element"><strong><a href = "{% url 'standart_sample' title=protocol.title date=protocol.control_date %}"> Перейти к информации о стандартном образце</strong></td>
-					{% else %}
-                  <td class="table-element"><strong>Стандартный образец отсутствует</strong></td>
+
+                {% if protocol.standart_sample%}
+                  <td class="table-element"><strong><a href = "{% url 'standart_sample' title=protocol.title date=protocol.control_date %}"> Перейти к информации о стандартном образце</strong></a></td>
+				{% else %}
+                  <td class="table-element"><strong>Информация о стандартном образце отсутствует</strong></td>
 				{% endif %}
+
+
                 <td class="table-element"><strong><a href = "{% url 'method' pk=protocol.pk %}"> {{protocol.method}}</strong></a>  </td>
-                {% if protocol.media %} 
-                    <td class="table-element"><strong><a href = "{{protocol.media.url}}">Загрузить</strong> </a></td>
-                    {% else %}
-                    <td class="table-element"><strong>Файл отсутствует</strong></td>
-                {% endif %}
              </tr>
             {% endfor %}
         </tbody>

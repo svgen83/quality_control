@@ -5,13 +5,14 @@
 <div class="container">
     <hr>
     <h2>Производственные серии антирабического иммуноглобулина</h2>
+
     <div class="table-responsive">
         <table class="table">
             <thead>
                 <tr>
                 <th class="table-element">Номер серии</th>
-                <th class="table-element">Объем серии</th>
-                <th class="table-element">Количество ампул</th>
+                <th class="table-element">Количество вторичных упаковок</th>
+                <th class="table-element">Количество первичных упаковок (ампул)</th>
                 <th class="table-element">Дата выпуска</th>
                 <th class="table-element">Срок годности</th>
                 <th class="table-element">Показатели качества</th>
@@ -20,15 +21,15 @@
             </thead>
             <tbody>
                 {% for batch in batches %}
-                
+
                 <tr>
                     <td class="table-element"><strong>{{ batch.title }}</strong></td>
-                    <td class="table-element"><strong>{{ batch.volume }}</strong></td>
+                    <td class="table-element"><strong>{{ batch.packs_quantity }}</strong></td>
                     <td class="table-element"><strong>{{ batch.ampoules_quantity }}</strong></td>
-                    <td class="table-element"><strong>{{ batch.issue_date }}</strong></td>
-                    <td class="table-element"><strong>{{ batch.best_before_date }}</strong></td>
-                    <td class="table-element"><strong><a href = "{% url 'quality_protocol' title=batch.title %}"> Показатели качества серии {{ batch.title }}</strong> </a></td>
-                    <td class="table-element"><strong><a href = "{% url 'batch_docs' title=batch.title %}"> Документация на серию {{ batch.title }}</strong> </a></td>
+                    <td class="table-element"><strong>{{ batch.issue_date|date:"d.m.Y" }}</strong></td>
+                    <td class="table-element"><strong>{{ batch.best_before_date|date:"d.m.Y" }}</strong></td>
+                    <td class="table-element"><strong><a href = "{% url 'quality_protocol' title=batch.title %}"> Cерия {{ batch.title }}</strong> </a></td>
+                    <td class="table-element"><strong><a href = "{% url 'batch_docs' title=batch.title %}"> Серия {{ batch.title }}</strong> </a></td>
                  </tr>
                 {% endfor %}
             </tbody>

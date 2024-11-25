@@ -1,6 +1,5 @@
 from django.db import models
 from datetime import date
-##from smart_selects.db_fields import ChainedForeignKey,GroupedForeignKey
 # Create your models here.
 
 
@@ -28,7 +27,7 @@ class Document(models.Model):
         db_index=True,
         blank=True)
     doc_media = models.FileField(upload_to='media', null=True, blank=True)
-    
+
     class Meta:
         verbose_name = 'Документация'
         verbose_name_plural = 'Документация'
@@ -62,11 +61,16 @@ class Method(models.Model):
 class SpecificationStandart(models.Model):
     MEASURE_CHOICE = (
         ('No measure', 'Нет размерности'),
-        ('UI', 'Международные единицы в мл'),
+        ('UI', 'Международные единицы в 1 мл'),
         ('percents', '%'),
         ('OI', 'Единица оптической плотности'),
-        ('temperature', 'градус Цельсия'))
-    
+        ('temperature', 'градус Цельсия'),
+        ('ml', 'мл'))
+    IF_STANDART_SAMPLE = (
+        ('Yes', 'Предусмотрен'),
+        ('No', 'Не предусмотрен'),
+        ('Oth', 'Предусмотрены образцы для сравнения'),
+        )
     title = models.CharField(
         max_length=200,
         verbose_name='название спецификационной характеристики')
@@ -95,6 +99,13 @@ class SpecificationStandart(models.Model):
         verbose_name='Метод определения', blank=True,
         on_delete=models.DO_NOTHING,
         related_name='reference_value')
+    if_samples = models.CharField(
+        max_length=50,
+        verbose_name='Предусмотрен ли образец сравнения',
+        choices=IF_STANDART_SAMPLE,
+        default='No',
+        db_index=True,
+        blank=True, null=True)
 
     class Meta:
         verbose_name = 'Нормативное значение показателя качества'
@@ -111,7 +122,8 @@ class StandartSample(models.Model):
         ('RF', 'Государственный'),
         ('OSO', 'Отраслевой'),
         ('WHO', 'Стандарт ВОЗ'),
-        ('IN_HOUSE', 'Стандарт предприятия')
+        ('IN_HOUSE', 'Стандарт предприятия'),
+        ('ST_C', 'Образец сравнения'),
     )
     title = models.CharField(max_length=200,
                              verbose_name='название стандартного образца')
@@ -122,6 +134,10 @@ class StandartSample(models.Model):
         max_digits=10,
         verbose_name='Значение определяемой характеристики',
         blank=True)
+    description = models.CharField(
+        max_length=1000,
+        verbose_name='Дополнительные сведения',
+        blank = True, null = True)
     sample_type = models.CharField(
         max_length=200,
         verbose_name='Вид стандартного образца',
@@ -147,7 +163,7 @@ class StandartSample(models.Model):
     class Meta:
         verbose_name = 'Стандартный образец'
         verbose_name_plural = 'Стандартные образцы'
-        ordering = ['title']
+        ordering = ['title','reg_number']
 
     def __str__(self):
         return self.title
@@ -171,7 +187,7 @@ class Employee(models.Model):
 
     def __str__(self):
         return self.title
-   
+
 
 class Batch(models.Model):
     title = models.PositiveSmallIntegerField(
@@ -181,10 +197,10 @@ class Batch(models.Model):
         max_digits=10,
         verbose_name='Объем серии',
         blank=True)
-    packs_quantity = models.PositiveSmallIntegerField(
-        verbose_name='Количество упаковок', blank=True)
     ampoules_quantity = models.PositiveSmallIntegerField(
         verbose_name='Количество ампул', blank=True)
+    packs_quantity = models.PositiveSmallIntegerField(
+        verbose_name='Количество упаковок', blank=True)
     issue_date = models.DateField(
         verbose_name='дата выпуска')
     best_before_date = models.DateField(
@@ -206,17 +222,17 @@ class Batch(models.Model):
 class SpecificationParameter(models.Model):
     MEASURE_CHOICE = (
         ('No measure', 'Нет размерности'),
-        ('UI', 'Международные единицы в мл'),
+        ('UI', 'Международные единицы в 1 мл'),
         ('percents', '%'),
         ('OI', 'Единица оптической плотности'),
         ('temperature', 'градус Цельсия'))# дублируется
-        
+
     title = models.ForeignKey(
         SpecificationStandart, on_delete=models.DO_NOTHING,
         verbose_name='Определяемая характеристика',
         related_name='batch_parameter')
     value = models.DecimalField(
-        decimal_places=2,
+        decimal_places=3,
         max_digits=10,
         blank=True,
         verbose_name='Количественное значение')
@@ -238,7 +254,7 @@ class SpecificationParameter(models.Model):
     begin_control_date = models.DateField(
         verbose_name='дата начала контроля', default=date.today)
     end_control_date = models.DateField(
-        verbose_name='дата завершения контроля', blank = True,
+        verbose_name='дата проведения контроля',
         default=date.today)
     butch_series = models.ForeignKey(
         Batch, on_delete=models.DO_NOTHING,
@@ -260,6 +276,3 @@ class SpecificationParameter(models.Model):
 
     def __str__(self):
         return str(self.title)
-
-
-

@@ -7,29 +7,27 @@
 <a class="navbar" href="{% url 'batches'%}">К списку серий антирабического иммуноглобулина</a>
 <h2>Документация на серию {{title}}</h2>
 {% if status %}
-	
+
 <div class="table-responsive">
     <table class="table">
         <thead>
             <tr>
             <th class="table-element">Название документа</th>
-            <th class="table-element">Регистрационный номер</th>
+            <th class="table-element">Номер документа</th>
             <th class="table-element">Дата утверждения</th>
-            <th class="table-element">Тип документа</th>
-            <th class="table-element">Кем утверждено</th>				
+            <th class="table-element">Кем утверждено</th>
             <th class="table-element">Просмотр документа</th>
             </tr>
         </thead>
         <tbody>
-				    {% for doc in docs %}      
+				    {% for doc in docs %}
             <tr>
               <td class="table-element"><strong>{{doc.title}}</strong></td>
               <td class="table-element"><strong>{{doc.reg_number}}</strong></td>
-              <td class="table-element"><strong>{{doc.approval_date}}</strong></td>
-              <td class="table-element"><strong>{{doc.type}}</strong></td>
+              <td class="table-element"><strong>{{doc.approval_date|date:"d.m.Y"}}</strong></td>
               <td class="table-element"><strong>{{doc.approving_authority}}</strong></td>
 						  {% if doc.doc_media %}
-              <td class="table-element"><strong>{{doc.doc_media}}</strong></td>
+			  <td class="table-element"><strong><a href = "{{doc.doc_media.url}}">Загрузить</strong> </a></td>
 						  {% else %}
               <td class="table-element"><strong>Текст отсутствует</strong></td>
 						  {% endif %}

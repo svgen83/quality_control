@@ -10,8 +10,8 @@ import plotly.graph_objs as go
 from .models import (Batch, StandartSample,
                      SpecificationStandart,Document,
                      SpecificationParameter, Employee,
-                     Method,                     
-                     ) 
+                     Method,
+                     )
 
 # Create your views here.
 @login_required
@@ -38,6 +38,7 @@ def get_batch_protocol(request, title):
     protocols = batch.batch_parameters.order_by('title')
     for protocol in protocols:
         reference = protocol.title
+        #ifsample = protocol.title__batch_parameter.if_samples
         if protocol.standart_samples:
             standart_sample = protocol.standart_samples.title
         else: standart_sample = None
@@ -54,10 +55,11 @@ def get_batch_protocol(request, title):
             'method': reference.methods.title,
             'media': protocol.media,
             'standart_sample': standart_sample,
+            #'if_sample':ifsample,
             'pk': reference.methods.pk,
                                }
         serialized_protocols.append(serialized_protocol)
-    
+
     return render(
         request,
         "quality_protocol.html",
@@ -90,33 +92,32 @@ def get_standart_sample(request, title, date):
         indicator__title=title,
         best_before_date__gte = date,
         issue_date__lte = date)
-    if samples:
-        return render(
+    return render(
             request, "standart_sample.html",
             context={'status': True,
                      'title': title,
                      'date': date,
                      'samples': samples}
                       )
-    else:
-        return render(
-            request,"standart_sample.html",
-            context={'status': False,
-                     'title': title,
-                     'date': date,})
- 
+  #  else:
+  #      return render(
+  #          request,"standart_sample.html",
+   #         context={'status': False,
+    #                 'title': title,
+     #                'date': date,})
+
 
 def get_method(request, pk):
     method = Method.objects.get(pk=pk)
     docs = Document.objects.filter(methods=method)
-    docs_serialized = [doc.title for doc in docs]
+    docs_serialized = [doc for doc in docs]
 
     return render(
         request,
         "method.html",
         context={'title': method.title,
                  'description': method.description,
-                 'docs_serialized': docs_serialized}
+                 'docs_serialized': docs_serialized,}
         )
 
 
@@ -135,7 +136,7 @@ def get_shuechart_data(specification_title):
 
     parameters = [batch.batch_parameters.filter(
             title__title__contains=specification_title) for batch in batches]
-    
+
     for parameter in parameters:
         if parameter:
             y_data.append(float(parameter[0].value))
@@ -157,7 +158,7 @@ def get_shuechart_data(specification_title):
     a_up = mean_y + 3*sigma
     a_l = mean_y - 3*sigma
     r_up = 3.267*mean_r
-    
+
     return {'y_data': y_data,
             'x_data': x_data,
             'x_data_r': x_r,
@@ -176,45 +177,42 @@ def get_shuechart_data(specification_title):
             'up_value': up_value,
             'low_value': low_value,
             }
-    
-def trend_data(x,y):
-    trend = np.polyfit(x, y, 1)
+
+def trend_data(y):
+    a = np.array([i+1 for i in range(len(y))])
+    trend = np.polyfit(a, y, 1)
     equation = np.poly1d(trend)
-    return equation(x)
-    
+    return equation(a)
+
 def plot_x_shuechart(shuechart_data, specification_title):
     ticks_x_list = list(map(str, shuechart_data['x_data']))
-    trend = np.polyfit(shuechart_data['x_data'],
-        shuechart_data['y_data'], 1)
-    p = np.poly1d(trend)
-    print(p)
-   
+
     fig = go.Figure()
     fig.add_trace(go.Scatter(
         x=shuechart_data['x_data'],
         y=shuechart_data['y_data'],
-        mode='lines+markers', name='Динамика',
+        mode='lines+markers', name='Паспортные данные',
         opacity=0.8, marker_color='green',))
 
     fig.add_trace(go.Scatter(x=shuechart_data['x_data'],
-        y=trend_data(shuechart_data['x_data'],shuechart_data['y_data']),
+        y=trend_data(shuechart_data['y_data']),
         opacity=1, name='Линия тренда', marker_color='black'))
 
     fig.add_trace(go.Scatter(
         x=shuechart_data['x_data'],
         y=f(shuechart_data['x_data'], shuechart_data['mean_y']),
-        name='Среднее значение', marker_color='orange'))
+        name='Центральная линия', marker_color='orange'))
 
     fig.add_trace(go.Scatter(
         x=shuechart_data['x_data'],
         y=f(shuechart_data['x_data'], shuechart_data['ucl']),
-        name='Верхняя граница',
+        name='Верхняя контрольная граница',
         marker_color='red'))
 
     fig.add_trace(go.Scatter(
         x=shuechart_data['x_data'],
         y=f(shuechart_data['x_data'], shuechart_data['lcl']),
-        name='Нижняя граница',
+        name='Нижняя контрольная граница',
         marker_color='red'))
 
     if shuechart_data['up_value']:
@@ -223,7 +221,7 @@ def plot_x_shuechart(shuechart_data, specification_title):
             y=f(shuechart_data['x_data'], shuechart_data['up_value']),
             name='Максимальное нормативное значение',
             marker_color='blue'))
-    
+
     if shuechart_data['low_value']:
         fig.add_trace(go.Scatter(
             x=shuechart_data['x_data'],
@@ -234,36 +232,36 @@ def plot_x_shuechart(shuechart_data, specification_title):
     fig.add_trace(go.Scatter(
         x=shuechart_data['x_data'],
         y=f(shuechart_data['x_data'], shuechart_data['c_up']),
-        name='c_up', opacity=0.2, marker_color='grey'))
+        name='Верхняя граница зоны С', opacity=0.2, marker_color='grey'))
 
     fig.add_trace(go.Scatter(
         x=shuechart_data['x_data'],
         y=f(shuechart_data['x_data'], shuechart_data['c_l']),
-        name='c_l', opacity=0.2, marker_color='grey'))
+        name='Нижняя граница зоны С', opacity=0.2, marker_color='grey'))
 
     fig.add_trace(go.Scatter(
         x=shuechart_data['x_data'],
         y=f(shuechart_data['x_data'], shuechart_data['b_up']),
-        name='b_up', opacity=0.2, marker_color='grey'))
+        name='Верхняя граница зоны В', opacity=0.2, marker_color='grey'))
 
     fig.add_trace(go.Scatter(
         x=shuechart_data['x_data'],
         y=f(shuechart_data['x_data'], shuechart_data['b_l']),
-        name='b_l', opacity=0.2, marker_color='grey'))
+        name='Нижняя граница зоны В', opacity=0.2, marker_color='grey'))
 
     fig.add_trace(go.Scatter(
         x=shuechart_data['x_data'],
         y=f(shuechart_data['x_data'], shuechart_data['a_up']),
-        name='a_up', opacity=0.2, marker_color='grey'))
+        name='Верхняя граница зоны А', opacity=0.2, marker_color='grey'))
 
     fig.add_trace(go.Scatter(
         x=shuechart_data['x_data'],
         y=f(shuechart_data['x_data'], shuechart_data['a_l']),
-        name='a_l', opacity=0.2, marker_color='grey'))
+        name='Нижняя граница зоны А', opacity=0.2, marker_color='grey'))
 
     fig.update_layout(legend_orientation="h",
                   legend=dict(x=.5, xanchor="center"),
-                  title=f"Карта Шухарта X {specification_title}",
+                  title=f"Карта Шухарта X - {specification_title}",
                   xaxis_title="Производственные серии",
                   yaxis_title="Значения показателя",
                   xaxis = dict(
@@ -287,20 +285,16 @@ def plot_r_shuechart(shuechart_data, specification_title):
     fig.add_trace(go.Scatter(
         x=shuechart_data['x_data_r'],
         y=f(shuechart_data['x_data_r'], shuechart_data['mean_r']),
-        name='Среднее значение размаха'))
+        name='Центральная линия размаха', marker_color='orange'))
 
     fig.add_trace(go.Scatter(
         x=shuechart_data['x_data_r'],
         y=f(shuechart_data['x_data_r'], shuechart_data['r_up']),
-        name='Верхняя контрольная граница размаха'))
-    
-    fig.add_trace(go.Scatter(x=shuechart_data['x_data_r'],
-        y=trend_data(shuechart_data['x_data_r'],shuechart_data['r_list']),
-        opacity=1, name='Линия тренда', marker_color='black'))
+        name='Верхняя контрольная граница размаха', marker_color='red'))
 
     fig.update_layout(legend_orientation="h",
                   legend=dict(x=.5, xanchor="center"),
-                  title=f"Карта Шухарта Rm {specification_title}",
+                  title=f"Карта Шухарта Rm - {specification_title}",
                   xaxis_title="Производственные серии",
                   yaxis_title="Значения размаха",
                   xaxis = dict(
@@ -336,5 +330,5 @@ def get_graphs(request):
         'specification_title': [],
         'plot_x' : [],
         'plot_r' : [],
-        }    
+        }
     return render(request, 'graphs.html', context)

@@ -2,7 +2,11 @@
 
 {% block content %}
 <div>
-	<a class="navbar" href="{% url 'batches' %}">Антирабический иммуноглобулин</a>
-	<a class="navbar" href="{% url 'graphs' %}">Карты Шухарта</a>
+
+	<center><h3><a class="navbar" href="{% url 'batches' %}">Антирабический иммуноглобулин</a></h3></center>
+	<center><img src="media/aig.jpg" alt=”иммуноглобулин”></center>
+	<center><h3><a class="navbar" href="{% url 'graphs' %}">Контрольные карты Шухарта</a></h3></center>
+	<center><img src="media/Контрольные карты Шухарта.jpg" alt=”статистический метод”></center>
+
 </div>
 {% endblock %}

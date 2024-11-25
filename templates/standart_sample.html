@@ -6,10 +6,10 @@
 
 <a class="navbar" href="{% url 'batches'%}">К списку серий антирабического иммуноглобулина</a>
 
-<h2>Стандартные образцы для определения характеристики {{title}} актуальные на {{date}}}</h2>
+<h2>Стандартные образцы для определения характеристики "{{title}}" актуальные на {{date}}</h2>
 
-{% if status %}
-	
+
+
 <div class="table-responsive">
     <table class="table">
         <thead>
@@ -19,12 +19,12 @@
             <th class="table-element">Дата выпуска</th>
             <th class="table-element">Срок годности</th>
             <th class="table-element">Вид образца</th>
-            <th class="table-element">Значение характеристики</th>				
+            <th class="table-element">Значение характеристики</th>
             <th class="table-element">Просмотр документа</th>
             </tr>
         </thead>
         <tbody>
-				    {% for sample in samples %}      
+				    {% for sample in samples %}
             <tr>
               <td class="table-element"><strong>{{sample.title}}</strong></td>
               <td class="table-element"><strong>{{sample.reg_number}}</strong></td>
@@ -35,13 +35,12 @@
 						  {% if sample.documents__doc_media %}
               <td class="table-element"><strong>{{sample.documents__doc_media}}</strong></td>
 						  {% else %}
-              <td class="table-element"><strong>Документация отсутствует</strong></td>
+              <td class="table-element"><strong>Документация не найдена</strong></td>
 						  {% endif %}
 						{% endfor %}
         </tbody>
     </table>
 </div>
-{% else %}
-<h2>Стандартные образцы либо отсутствуют, либо не предусмотрены</h2>
-{% endif %}
+
+
 {% endblock %}

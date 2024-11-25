@@ -17,9 +17,10 @@
   <h2>Метод встречается в следующей документации</h2>
   {% for doc in docs_serialized %}
   {{ doc.title }} <br>
+  <a href = "{{doc.doc_media.url}}">Загрузить</a>
   {% endfor %}
 
-  
+
 </p>
 </div>
 {% endblock %}
