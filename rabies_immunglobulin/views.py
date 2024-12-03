@@ -35,29 +35,29 @@ def get_batches(request):
 def get_batch_protocol(request, title):
     batch = Batch.objects.get(title=title)
     serialized_protocols = []
-    protocols = batch.batch_parameters.order_by('title')
+    protocols = batch.batch_parameters.order_by('title__index_number')
     for protocol in protocols:
         reference = protocol.title
-        #ifsample = protocol.title__batch_parameter.if_samples
-        if protocol.standart_samples:
-            standart_sample = protocol.standart_samples.title
-        else: standart_sample = None
+        ifsample = reference.if_sample
+        control_date = protocol.end_control_date
+
         serialized_protocol = {
-            'title': reference,
+            'title': reference.title,
             'value': protocol.value,
             'measure': protocol.get_measure_display(),
             'description': protocol.description,
             'controler': protocol.controler,
-            'control_date': protocol.end_control_date,
+            'control_date': control_date,
             'up_value': reference.upper_limit,
             'low_value': reference.lower_limit,
             'reference_description': reference.reference_description,
             'method': reference.methods.title,
             'media': protocol.media,
-            'standart_sample': standart_sample,
-            #'if_sample':ifsample,
+##            'standart_sample': standart_sample,
+            'if_sample': ifsample,
             'pk': reference.methods.pk,
                                }
+        print(reference.reference_sample)
         serialized_protocols.append(serialized_protocol)
 
     return render(
@@ -71,7 +71,6 @@ def get_batch_protocol(request, title):
 
 def get_batch_docs(request, title):
     docs = Document.objects.filter(series__title=title)
-    print(docs)
     if docs:
         return render(
             request, "batch_docs.html",
@@ -88,23 +87,29 @@ def get_batch_docs(request, title):
 
 
 def get_standart_sample(request, title, date):
+
     samples = StandartSample.objects.filter(
         indicator__title=title,
-        best_before_date__gte = date,
-        issue_date__lte = date)
-    return render(
+        indicator__if_sample=True,
+        best_before_date__gte=date,
+        issue_date__lte=date)
+
+    if samples:
+        return render(
             request, "standart_sample.html",
-            context={'status': True,
-                     'title': title,
-                     'date': date,
-                     'samples': samples}
-                      )
-  #  else:
-  #      return render(
-  #          request,"standart_sample.html",
-   #         context={'status': False,
-    #                 'title': title,
-     #                'date': date,})
+            context={
+                'status': True,
+                'title': title,
+                'date': date,
+                'samples': samples})
+    else:
+        return render(
+        request,"standart_sample.html",
+        context={'status': False,
+                 'title': title,
+                 'date': date
+                 }
+        )
 
 
 def get_method(request, pk):

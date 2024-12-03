@@ -7,8 +7,7 @@
 <a class="navbar" href="{% url 'batches'%}">К списку серий антирабического иммуноглобулина</a>
 
 <h2>Стандартные образцы для определения характеристики "{{title}}" актуальные на {{date}}</h2>
-
-
+{% if status %}
 
 <div class="table-responsive">
     <table class="table">
@@ -41,6 +40,8 @@
         </tbody>
     </table>
 </div>
-
+{% else %}
+<h2>Актуальных стандартных образцов  не найдено</h2>
+{% endif %}
 
 {% endblock %}

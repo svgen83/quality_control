@@ -48,7 +48,7 @@
 
                 <td class="table-element"><strong>{{ protocol.description }}</strong></td>
 
-                {% if protocol.standart_sample%}
+                {% if protocol.if_sample %}
                   <td class="table-element"><strong><a href = "{% url 'standart_sample' title=protocol.title date=protocol.control_date %}"> Перейти к информации о стандартном образце</strong></a></td>
 				{% else %}
                   <td class="table-element"><strong>Информация о стандартном образце отсутствует</strong></td>

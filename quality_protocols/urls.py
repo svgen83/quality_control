@@ -19,7 +19,10 @@ urlpatterns = [
     re_path(r'^batch_docs/(?P<title>\w+)/$',
             views.get_batch_docs,
             name='batch_docs'),
-    re_path(r'^standart_sample/(?P<title>\D+)/(?P<date>\d{4}-\d{2}-\d{2})/$',
+##    re_path(r'^standart_sample/(?P<title>\D+)/(?P<date>\d{4}-\d{2}-\d{2})/$',
+##            views.get_standart_sample,
+##            name='standart_sample'),
+    re_path(r'^standart_sample/(?P<title>\D.+)/(?P<date>\d{4}-\d{2}-\d{2})/$',
             views.get_standart_sample,
             name='standart_sample'),
 

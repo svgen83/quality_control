@@ -65,15 +65,19 @@ class SpecificationStandart(models.Model):
         ('percents', '%'),
         ('OI', 'Единица оптической плотности'),
         ('temperature', 'градус Цельсия'),
-        ('ml', 'мл'))
-    IF_STANDART_SAMPLE = (
-        ('Yes', 'Предусмотрен'),
-        ('No', 'Не предусмотрен'),
-        ('Oth', 'Предусмотрены образцы для сравнения'),
-        )
+        ('ml', 'мл'),
+        ('pH', 'единица рН'))
+##    IF_STANDART_SAMPLE = (
+##        ('Yes', 'Предусмотрен'),
+##        ('No', 'Не предусмотрен'),
+##        )
     title = models.CharField(
         max_length=200,
         verbose_name='название спецификационной характеристики')
+    index_number = models.PositiveIntegerField(
+        verbose_name='номер в соответствии с протоколом исследования',
+        default=0       
+        )
     measure = models.CharField(
         max_length=50,
         verbose_name='единица измерения',
@@ -99,13 +103,10 @@ class SpecificationStandart(models.Model):
         verbose_name='Метод определения', blank=True,
         on_delete=models.DO_NOTHING,
         related_name='reference_value')
-    if_samples = models.CharField(
-        max_length=50,
-        verbose_name='Предусмотрен ли образец сравнения',
-        choices=IF_STANDART_SAMPLE,
-        default='No',
-        db_index=True,
-        blank=True, null=True)
+    if_sample = models.BooleanField(
+        verbose_name='Предусмотрен ли стандартный образец',
+        default=False,
+        db_index=True)
 
     class Meta:
         verbose_name = 'Нормативное значение показателя качества'
@@ -153,10 +154,10 @@ class StandartSample(models.Model):
         verbose_name='документация', blank =True,
         on_delete=models.DO_NOTHING, null = True,
         related_name='sample')
-    indicator = models.ForeignKey(
+    indicator = models.ManyToManyField(
         SpecificationStandart,
         blank =True,
-        on_delete=models.DO_NOTHING, null = True,
+        null = True,
         verbose_name='Определяемая характеристика',
         related_name = 'reference_sample')
 
@@ -224,6 +225,7 @@ class SpecificationParameter(models.Model):
         ('No measure', 'Нет размерности'),
         ('UI', 'Международные единицы в 1 мл'),
         ('percents', '%'),
+        ('pH', 'единица рН'),
         ('OI', 'Единица оптической плотности'),
         ('temperature', 'градус Цельсия'))# дублируется
 
@@ -261,11 +263,11 @@ class SpecificationParameter(models.Model):
         related_name='batch_parameters',
         blank=True, null=True,
         verbose_name='Номер серии')
-    standart_samples = models.ForeignKey(
-        StandartSample, on_delete=models.DO_NOTHING,
-        related_name='control_appl',
-        blank=True, null=True,
-        verbose_name='Стандартный образец')
+##    standart_samples = models.ForeignKey(
+##        StandartSample, on_delete=models.DO_NOTHING,
+##        related_name='control_appl',
+##        blank=True, null=True,
+##        verbose_name='Стандартный образец')
     media = models.FileField(upload_to='media', null=True, blank=True)
 
     class Meta:
