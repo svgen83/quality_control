@@ -100,10 +100,6 @@ class SpecificationStandart(models.Model):
         verbose_name='Метод определения', blank=True,
         on_delete=models.DO_NOTHING,
         related_name='reference_value')
-##    if_sample = models.BooleanField(
-##        verbose_name='Предусмотрен ли стандартный образец',
-##        default=False,
-##        db_index=True, blank=True, null=True)
 
     class Meta:
         verbose_name = 'Нормативное значение показателя качества'
@@ -153,8 +149,6 @@ class StandartSample(models.Model):
         related_name='sample')
     indicator = models.ManyToManyField(
         SpecificationStandart,
-        blank =True,
-        null = True,
         verbose_name='Определяемая характеристика',
         related_name = 'reference_sample')
 
@@ -261,12 +255,6 @@ class SpecificationParameter(models.Model):
         blank=True, null=True,
         verbose_name='Номер серии')
     media = models.FileField(upload_to='media', null=True, blank=True)
-
-##    standart_samples = models.ForeignKey(
-##        StandartSample, on_delete=models.DO_NOTHING,
-##        related_name='control_appl',
-##        blank=True, null=True,
-##        verbose_name='Стандартный образец')
 
     class Meta:
         verbose_name = 'Значение показателя качества производственной серии'

@@ -88,9 +88,6 @@ def get_batch_docs(request, title):
 
 
 def get_standart_sample(request, title, date):
-    print(date)
-    print(title)
-
     samples = StandartSample.objects.filter(
         indicator__title=title,
         best_before_date__gte=date,
