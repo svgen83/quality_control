@@ -1,6 +1,7 @@
 from django.db import models
 from datetime import date
 # Create your models here.
+from ckeditor.fields import RichTextField
 
 
 class Document(models.Model):
@@ -41,7 +42,7 @@ class Method(models.Model):
     title = models.CharField(
         max_length=200,
         verbose_name='Название метода', blank=True)
-    description = models.TextField(
+    description = RichTextField(
         verbose_name='Описание метода', blank=True)
     docs = models.ManyToManyField(
         Document,
@@ -67,10 +68,6 @@ class SpecificationStandart(models.Model):
         ('temperature', 'градус Цельсия'),
         ('ml', 'мл'),
         ('pH', 'единица рН'))
-##    IF_STANDART_SAMPLE = (
-##        ('Yes', 'Предусмотрен'),
-##        ('No', 'Не предусмотрен'),
-##        )
     title = models.CharField(
         max_length=200,
         verbose_name='название спецификационной характеристики')
@@ -103,10 +100,10 @@ class SpecificationStandart(models.Model):
         verbose_name='Метод определения', blank=True,
         on_delete=models.DO_NOTHING,
         related_name='reference_value')
-    if_sample = models.BooleanField(
-        verbose_name='Предусмотрен ли стандартный образец',
-        default=False,
-        db_index=True)
+##    if_sample = models.BooleanField(
+##        verbose_name='Предусмотрен ли стандартный образец',
+##        default=False,
+##        db_index=True, blank=True, null=True)
 
     class Meta:
         verbose_name = 'Нормативное значение показателя качества'
@@ -263,12 +260,13 @@ class SpecificationParameter(models.Model):
         related_name='batch_parameters',
         blank=True, null=True,
         verbose_name='Номер серии')
+    media = models.FileField(upload_to='media', null=True, blank=True)
+
 ##    standart_samples = models.ForeignKey(
 ##        StandartSample, on_delete=models.DO_NOTHING,
 ##        related_name='control_appl',
 ##        blank=True, null=True,
 ##        verbose_name='Стандартный образец')
-    media = models.FileField(upload_to='media', null=True, blank=True)
 
     class Meta:
         verbose_name = 'Значение показателя качества производственной серии'

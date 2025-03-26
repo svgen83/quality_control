@@ -38,7 +38,10 @@ def get_batch_protocol(request, title):
     protocols = batch.batch_parameters.order_by('title__index_number')
     for protocol in protocols:
         reference = protocol.title
-        ifsample = reference.if_sample
+        if reference.reference_sample.all():
+            ifsample = True
+        else: ifsample = None
+        
         control_date = protocol.end_control_date
 
         serialized_protocol = {
@@ -53,11 +56,9 @@ def get_batch_protocol(request, title):
             'reference_description': reference.reference_description,
             'method': reference.methods.title,
             'media': protocol.media,
-##            'standart_sample': standart_sample,
             'if_sample': ifsample,
             'pk': reference.methods.pk,
                                }
-        print(reference.reference_sample)
         serialized_protocols.append(serialized_protocol)
 
     return render(
@@ -87,10 +88,11 @@ def get_batch_docs(request, title):
 
 
 def get_standart_sample(request, title, date):
+    print(date)
+    print(title)
 
     samples = StandartSample.objects.filter(
         indicator__title=title,
-        indicator__if_sample=True,
         best_before_date__gte=date,
         issue_date__lte=date)
 

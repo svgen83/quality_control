@@ -1,0 +1,1 @@
+<a href = "{% url 'standart_sample' title=protocol.title date=protocol.control_date %}">
